@@ -1,0 +1,3 @@
+## 📦 Olist Late Delivery Prediction Service (MLOps Task 3)
+
+An end-to-end production-grade MLOps inference pipeline predicting whether an e-commerce order will be delivered late or on-time using the Olist dataset. The project refactors research notebooks into a modular Python architecture featuring data validation (Great Expectations), data versioning (DVC), model tracking and registry (MLflow), automated testing (pytest), and logging. It serves real-time predictions via a FastAPI service containerized with Docker Compose, enforced by GitHub Actions CI/CD.
