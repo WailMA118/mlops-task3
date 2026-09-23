@@ -1,0 +1,107 @@
+# =============================================================================
+# olist-late-delivery — central configuration
+# Every path and parameter used by src/ and app/ must come from this file.
+# Override any value with an environment variable named CONFIG__<UPPER__PATH>,
+# e.g. CONFIG__DATABASE__URL, handled in src/utils/config.py.
+# =============================================================================
+
+project:
+  name: "olist-late-delivery"
+  random_state: 42
+
+database:
+  # Overridden in containers via env var DATABASE_URL (see src/utils/config.py)
+  url: "postgresql://mlops:mlops@localhost:5433/olist"
+
+paths:
+  data:
+    raw_dir: "data/raw"
+    interim_dir: "data/interim"
+    processed_dir: "data/processed"
+    ml_table: "data/interim/ml_orders_dataset.parquet"
+    ml_table_labeled: "data/interim/ml_orders_labeled.parquet"
+    train: "data/processed/train.parquet"
+    val: "data/processed/val.parquet"
+    test: "data/processed/test.parquet"
+    feature_table_train: "data/processed/feature_table_train.parquet"
+    feature_table_val: "data/processed/feature_table_val.parquet"
+    feature_table_test: "data/processed/feature_table_test.parquet"
+  artifacts:
+    feature_engineering_dir: "models/feature_engineering_artifacts"
+    numeric_imputer: "models/feature_engineering_artifacts/numeric_imputer.joblib"
+    onehot_encoder: "models/feature_engineering_artifacts/onehot_encoder.joblib"
+    payment_encoder: "models/feature_engineering_artifacts/payment_encoder.joblib"
+    same_state_fill_value: "models/feature_engineering_artifacts/same_state_fill_value.joblib"
+    feature_list_raw: "models/feature_engineering_artifacts/feature_list_raw.json"
+    final_feature_list: "models/feature_engineering_artifacts/final_feature_list.json"
+  model:
+    model_dir: "models/model_artifacts"
+    final_model: "models/model_artifacts/final_model_random_forest.joblib"
+    model_config: "models/model_artifacts/final_model_config.json"
+    results_summary: "models/model_artifacts/results_summary.csv"
+    feature_importances: "models/model_artifacts/feature_importances.csv"
+
+split:
+  test_size: 0.30
+  val_ratio_of_temp: 0.50
+  stratify_column: "is_late"
+
+target:
+  column: "is_late"
+
+features:
+  window_days: 5
+  numeric_features:
+    - "total_price"
+    - "total_freight"
+    - "num_items"
+    - "num_sellers"
+    - "num_products"
+    - "total_weight"
+    - "num_payment_sequential"
+    - "avg_distance_km"
+    - "max_distance_km"
+    - "purchase_month"
+    - "customer_state_pressure_5d"
+    - "seller_pressure_5d"
+  categorical_single_features:
+    - "customer_state"
+    - "purchase_weekday"
+  multi_value_feature: "payment_types"
+  boolean_features:
+    - "same_state"
+    - "is_holiday"
+
+model:
+  algorithm: "random_forest"
+  tuning_metric: "f1"
+  decision_threshold: 0.5
+  class_weight: "balanced"
+  param_grid:
+    n_estimators: [200, 400]
+    max_depth: [null, 10, 20]
+    min_samples_leaf: [1, 5, 10]
+
+mlflow:
+  tracking_uri: "http://localhost:5000"
+  experiment_name: "olist-late-delivery"
+  registered_model_name: "olist-late-delivery-rf"
+  registry_stage: "Production"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+  log_dir: "logs"
+  app_log_file: "logs/app.log"
+  predictions_log_file: "logs/predictions.log"
+
+validation:
+  # Great Expectations behavior when a batch fails its expectation suite
+  on_failure: "reject"   # one of: reject | flag | default
+  suite_dir: "great_expectations"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  title: "Olist Late Delivery Prediction API"
+  version: "0.1.0"
