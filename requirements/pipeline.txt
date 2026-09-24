@@ -1,0 +1,13 @@
+# Training-pipeline dependencies: needed to run `dvc repro` (data_prep, split,
+# eda, feature_engineering, train stages) but NOT by the inference API at
+# runtime. Kept separate from base.txt so the production Docker image (which
+# installs base.txt only) stays lean and never pulls in plotting libraries.
+#
+# Install alongside base.txt when running the training pipeline locally or in
+# a CI training job:
+#   pip install -r requirements/base.txt -r requirements/pipeline.txt
+
+-r base.txt
+
+matplotlib==3.8.4
+seaborn==0.13.2
