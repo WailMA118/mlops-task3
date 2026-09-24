@@ -1,0 +1,6 @@
+# Model artifacts are DVC-tracked (dvc.yaml outs:) and/or pulled from the
+# MLflow artifact store — never committed to git directly.
+feature_engineering_artifacts/*
+model_artifacts/*
+!feature_engineering_artifacts/.gitkeep
+!model_artifacts/.gitkeep
