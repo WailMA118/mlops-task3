@@ -1,0 +1,10 @@
+# Backend/API dependencies for app/main.py and app/schemas.py.
+# base.txt is included because the API imports the inference pipeline and its
+# model/feature artifacts at startup.
+-r base.txt
+
+# Direct API dependencies
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+pydantic==2.7.1
+pydantic-settings==2.2.1

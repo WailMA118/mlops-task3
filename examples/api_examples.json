@@ -1,0 +1,40 @@
+{
+  "single_predict": {
+    "order_id": "order-001",
+    "customer_id": "customer-001",
+    "order_purchase_timestamp": "2017-01-01T10:30:00",
+    "customer_state": "SP",
+    "seller_states": "SP",
+    "payment_types": "credit_card",
+    "total_price": 58.9,
+    "total_freight": 13.29,
+    "num_items": 1,
+    "num_sellers": 1,
+    "num_products": 1,
+    "total_weight": 500,
+    "num_payment_sequential": 1,
+    "avg_distance_km": 10.5,
+    "max_distance_km": 10.5
+  },
+  "batch_predict": {
+    "orders": [
+      {
+        "order_id": "order-001",
+        "customer_id": "customer-001",
+        "order_purchase_timestamp": "2017-01-01T10:30:00",
+        "customer_state": "SP",
+        "seller_states": "SP",
+        "payment_types": "credit_card",
+        "total_price": 58.9,
+        "total_freight": 13.29,
+        "num_items": 1,
+        "num_sellers": 1,
+        "num_products": 1,
+        "total_weight": 500,
+        "num_payment_sequential": 1,
+        "avg_distance_km": 10.5,
+        "max_distance_km": 10.5
+      }
+    ]
+  }
+}

@@ -20,7 +20,7 @@ tracked as next steps below.
 
 ```
 .
-├── app/                      # FastAPI service (routes, schemas) — TODO
+├── app/                      # FastAPI service (routes, schemas)
 ├── config/
 │   └── config.yaml           # single source of truth for paths & parameters
 ├── data/
@@ -39,7 +39,7 @@ tracked as next steps below.
 │   ├── pipeline/             # training-time orchestration: split, EDA, feature eng, train (Notebook 3, 4, 5, 6)
 │   ├── inference/            # INFERENCE-ONLY: model loading + predict pipeline
 │   └── utils/                # config loader, logging, MLflow helpers
-├── tests/                    # unit / data / integration tests — TODO
+├── tests/                    # FastAPI integration/contract tests
 ├── requirements/
 │   ├── base.txt               # runtime deps (used in the Docker image)
 │   ├── pipeline.txt           # + matplotlib/seaborn, for running the DVC training pipeline (incl. EDA)
@@ -144,13 +144,13 @@ python -m src.pipeline.run_train
 The `train` stage logs every run to MLflow and registers the selected model.
 The `eda` stage requires `requirements/pipeline.txt` (matplotlib/seaborn).
 
-### 6. Run the API (once implemented)
+### 6. Run the API
 
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 7. Run tests (once implemented)
+### 7. Run tests
 
 ```bash
 pytest
@@ -181,3 +181,18 @@ See `config/config.yaml`'s `validation`, `api`, and `mlflow` sections for
 the scaffolding already in place for: Great Expectations suites, the
 FastAPI app, and monitoring. Docker/Compose, CI/CD, and the pytest suite are
 the remaining Definition-of-Done items from Task 3.
+
+## FastAPI Task 3
+
+The service exposes:
+
+- `GET /health` — service/model health.
+- `GET /model` and `GET /model/info` — model name, registry stage, source, version, threshold, and feature count.
+- `POST /predict` — one validated order.
+- `POST /predict/batch` — 1–100 validated orders.
+- `GET /docs` — Swagger UI with request/response examples.
+- `GET /redoc` — ReDoc documentation.
+
+Run locally with `uvicorn app.main:app --reload --port 8000`, then open `http://127.0.0.1:8000/docs`.
+
+The API rejects unknown fields and invalid values with HTTP 422. Inference never fits transformers or the model; it uses the already-fitted artifacts and the registered MLflow model through `src/inference`.
