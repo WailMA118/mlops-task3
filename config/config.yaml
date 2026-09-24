@@ -40,6 +40,24 @@ paths:
     model_config: "models/model_artifacts/final_model_config.json"
     results_summary: "models/model_artifacts/results_summary.csv"
     feature_importances: "models/model_artifacts/feature_importances.csv"
+  eda:
+    report_dir: "reports/eda"
+    numerical_distributions_plot: "reports/eda/numerical_distributions_and_outliers.png"
+    relations_and_correlations_plot: "reports/eda/relations_and_correlations.png"
+    date_analysis_plot: "reports/eda/date_analysis.png"
+    geography_analysis_plot: "reports/eda/geography_analysis.png"
+    categorical_summary: "reports/eda/categorical_summary.csv"
+    messy_values: "reports/eda/messy_values.csv"
+    numeric_summary: "reports/eda/numeric_summary.csv"
+    missing_summary: "reports/eda/missing_summary.csv"
+    status_relation: "reports/eda/status_relation.csv"
+    payment_relation: "reports/eda/payment_relation.csv"
+    status_label_crosstab: "reports/eda/status_label_crosstab.csv"
+    correlation_matrix: "reports/eda/correlation_matrix.csv"
+    distance_late_rate: "reports/eda/distance_late_rate.csv"
+    distance_corr: "reports/eda/distance_corr.csv"
+    feature_selection: "reports/eda/feature_selection.csv"
+    findings_summary: "reports/eda/findings_summary.txt"
 
 split:
   test_size: 0.30
@@ -71,6 +89,79 @@ features:
   boolean_features:
     - "same_state"
     - "is_holiday"
+
+eda:
+  # Where Notebook 4's analysis (task2nb4.ipynb -> src/pipeline/eda.py) writes
+  # its plots, summary CSVs, and findings.
+  report_dir: "reports/eda"
+  # Which split the EDA runs against. train.parquet only, by design (nb4 never
+  # opens val/test) — matches split.<key> under paths.data.
+  input_split: "train"
+  # Semantic type of every column the EDA touches, so numeric/categorical/date
+  # handling never hardcodes a column list in code. Extend when new columns
+  # are added upstream (Notebook 1/2/5) rather than editing src/pipeline/eda.py.
+  column_types:
+    order_id: "id"
+    customer_id: "id"
+    customer_unique_id: "id"
+    order_status: "categorical"
+    payment_types: "categorical"
+    customer_city: "categorical"
+    customer_state: "categorical"
+    customer_zip_code_prefix: "categorical"
+    seller_states: "categorical"
+    seller_zip_codes: "categorical"
+    order_purchase_timestamp: "date"
+    order_approved_at: "date"
+    order_delivered_carrier_date: "date"
+    order_delivered_customer_date: "date"
+    order_estimated_delivery_date: "date"
+    total_price: "numerical"
+    total_freight: "numerical"
+    num_items: "numerical"
+    num_sellers: "numerical"
+    num_products: "numerical"
+    total_weight: "numerical"
+    num_photos: "numerical"
+    avg_distance_km: "numerical"
+    max_distance_km: "numerical"
+    min_distance_km: "numerical"
+    total_payment_value: "numerical"
+    num_payment_sequential: "numerical"
+    is_late: "numerical"
+  # Columns whose missingness has a known real-world cause (used to annotate
+  # the missing-value report instead of leaving it as an unexplained number).
+  meaningful_missing_columns:
+    order_approved_at: "Order not approved."
+    order_delivered_carrier_date: "Order not shipped."
+    total_price: "Order has no item records."
+    total_freight: "Order has no item records."
+    num_items: "Order has no item records."
+    num_sellers: "Order has no seller records."
+    num_products: "Order has no product records."
+    total_weight: "Product weight not recorded."
+    num_photos: "Product photo count not recorded."
+    avg_distance_km: "Seller/customer distance unavailable."
+    max_distance_km: "Seller/customer distance unavailable."
+    min_distance_km: "Seller/customer distance unavailable."
+  # Columns treated as non-negative in the raw-range sanity check (substring
+  # match against the column name, same rule Notebook 4 used).
+  non_negative_keywords:
+    - "price"
+    - "freight"
+    - "items"
+    - "payment"
+    - "weight"
+    - "photos"
+    - "seller"
+    - "product"
+    - "distance"
+  outlier_iqr_multiplier: 1.5
+  rare_category_threshold: 0.01
+  top_categories_to_plot: 15
+  min_state_orders_for_ranking: 20
+  distance_bucket_edges: [-1, 0, 100, 500, 1000, 2000, 10000]
+  distance_bucket_labels: ["0", "0-100", "100-500", "500-1000", "1000-2000", "2000+"]
 
 model:
   algorithm: "random_forest"
