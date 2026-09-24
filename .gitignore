@@ -1,111 +1,33 @@
-# Data
-logs/
-stores/
-mlflow/
-results/
-workspaces/
-efs/
-
-# VSCode
-.vscode/
-.idea
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Flask:
-instance/
-.webassets-cache
-
-# Scrapy:
-.scrapy
-
-# Sphinx
-docs/_build/
-
-# PyBuilder
-target/
-
-# IPython
-.ipynb_checkpoints
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# PEP 582
-__pypackages__/
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# Environment
-.env
-.venv
-env/
+.venv/
 venv/
-ENV/
-env.bak/
-venv.bak/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
 
-# mkdocs
-site/
+# Env / secrets
+.env
+*.env.local
 
-# Airflow
-airflow/airflow.db
+# Logs
+logs/*.log*
 
-# MacOS
+# Jupyter
+.ipynb_checkpoints/
+
+# DVC — keep .dvc pointer files, ignore actual cached content
+/dvc-storage/
+.dvc/cache/
+.dvc/tmp/
+
+# MLflow local runs (when not using a server)
+mlruns/
+mlartifacts/
+
+# OS
 .DS_Store
-
-# Clean up
-.trash/
