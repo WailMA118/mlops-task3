@@ -30,4 +30,3 @@ great-expectations==0.18.15
 
 # Monitoring / metrics endpoint
 prometheus-client==0.20.0
-
