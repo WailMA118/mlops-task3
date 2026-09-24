@@ -1,0 +1,22 @@
+# Never send notebooks or local development state to the Docker build context.
+notebooks/
+.venv/
+venv/
+.git/
+.github/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+__pycache__/
+*.py[cod]
+.coverage
+htmlcov/
+.env
+*.env.local
+logs/*.log*
+.dvc/cache/
+.dvc/tmp/
+dvc-storage/
+mlruns/
+mlartifacts/
+reports/

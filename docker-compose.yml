@@ -1,0 +1,113 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mlops}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-olist}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER must be set in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD must be set in .env}
+    volumes:
+      - artifact_data:/data
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  create-artifact-bucket:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?MINIO_ROOT_USER must be set in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD must be set in .env}
+    entrypoint: ["/bin/sh", "-c"]
+    command: >-
+      "mc alias set local http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD
+      && mc mb --ignore-existing local/${ARTIFACT_BUCKET:-mlflow-artifacts}"
+    restart: "no"
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.13.0
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      create-artifact-bucket:
+        condition: service_completed_successfully
+    environment:
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:?MINIO_ROOT_USER must be set in .env}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD must be set in .env}
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+    command: >-
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri postgresql+psycopg2://${POSTGRES_USER:-mlops}:${POSTGRES_PASSWORD}@db:5432/mlflow
+      --default-artifact-root s3://${ARTIFACT_BUCKET:-mlflow-artifacts}/
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/version')"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mlflow:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      CONFIG__DATABASE__URL: postgresql://${POSTGRES_USER:-mlops}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-olist}
+      CONFIG__MLFLOW__TRACKING_URI: http://mlflow:5000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER:?MINIO_ROOT_USER must be set in .env}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD:?MINIO_ROOT_PASSWORD must be set in .env}
+      MLFLOW_S3_ENDPOINT_URL: http://minio:9000
+      CONFIG__API__HOST: 0.0.0.0
+      CONFIG__API__PORT: 8000
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - api_logs:/app/logs
+      - model_artifacts:/app/models
+      - inference_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  postgres_data:
+  artifact_data:
+  api_logs:
+  model_artifacts:
+  inference_data:
