@@ -1,0 +1,8 @@
+column,cardinality,missing_count,rare_categories_lt_1pct,normalized_duplicate_groups
+order_status,2,0,1,2
+payment_types,7,0,1,6
+customer_city,3650,0,3641,2506
+customer_state,27,0,14,27
+customer_zip_code_prefix,13667,0,13667,10245
+seller_states,60,0,54,44
+seller_zip_codes,2712,0,2701,1766

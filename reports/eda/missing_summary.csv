@@ -1,0 +1,29 @@
+Column,Missing_Count,Missing_Percentage,Meaningful_Missing
+order_id,0,0.0,Not meaningful
+customer_id,0,0.0,Not meaningful
+order_status,0,0.0,Not meaningful
+order_purchase_timestamp,0,0.0,Not meaningful
+order_approved_at,11,0.0162883331112197,Order not approved.
+order_delivered_carrier_date,1,0.0014807575555654273,Order not shipped.
+order_delivered_customer_date,0,0.0,Not meaningful
+order_estimated_delivery_date,0,0.0,Not meaningful
+customer_unique_id,0,0.0,Not meaningful
+customer_zip_code_prefix,0,0.0,Not meaningful
+customer_city,0,0.0,Not meaningful
+customer_state,0,0.0,Not meaningful
+total_price,0,0.0,Order has no item records.
+total_freight,0,0.0,Order has no item records.
+num_items,0,0.0,Order has no item records.
+num_sellers,0,0.0,Order has no seller records.
+seller_states,0,0.0,Not meaningful
+seller_zip_codes,0,0.0,Not meaningful
+num_products,0,0.0,Order has no product records.
+total_weight,0,0.0,Product weight not recorded.
+num_photos,0,0.0,Product photo count not recorded.
+avg_distance_km,323,0.478284690447633,Seller/customer distance unavailable.
+max_distance_km,323,0.478284690447633,Seller/customer distance unavailable.
+min_distance_km,323,0.478284690447633,Seller/customer distance unavailable.
+total_payment_value,0,0.0,Not meaningful
+num_payment_sequential,0,0.0,Not meaningful
+payment_types,0,0.0,Not meaningful
+is_late,0,0.0,Not meaningful

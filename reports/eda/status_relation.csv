@@ -1,0 +1,3 @@
+order_status,count,mean,late_rate_percent
+canceled,4,0.25,25.0
+delivered,67529,0.08112070369767063,8.112070369767062

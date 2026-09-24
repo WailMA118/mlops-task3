@@ -1,0 +1,8 @@
+EDA uses train.parquet only; other splits were not opened.
+Training shape: 67,533 rows and 28 columns.
+Customer city and ZIP prefixes have high cardinality and need careful encoding.
+Median delivery time: 10.21 days.
+Numerical features are right-skewed and contain IQR outliers.
+Holiday late rate: 6.38% versus 8.14% on non-holidays.
+Longer customer-seller distance is associated with a higher late rate.
+Use these findings to guide imputation, encoding, outlier treatment, and model selection.

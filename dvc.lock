@@ -1,0 +1,227 @@
+schema: '2.0'
+stages:
+  data_prep:
+    cmd: python -m src.pipeline.run_data_prep
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01a34c4edc3013046dd215796ce3b63a
+      size: 7465
+    - path: src/data/build_ml_table.py
+      hash: md5
+      md5: a6db44b20209dd2723db8b4583c70f56
+      size: 6415
+    - path: src/data/db.py
+      hash: md5
+      md5: 783d79c74ef15a738ef87bc106fb5b95
+      size: 1484
+    - path: src/data/geo.py
+      hash: md5
+      md5: db8164e370ef8ee7b9e7c174ac14165b
+      size: 1234
+    - path: src/data/labeling.py
+      hash: md5
+      md5: fd3c37aaa827ba5c04d616c9ce3dac89
+      size: 1692
+    outs:
+    - path: data/interim/ml_orders_dataset.parquet
+      hash: md5
+      md5: 63978b9d6f878a279009d2cd29741e62
+      size: 18249991
+    - path: data/interim/ml_orders_labeled.parquet
+      hash: md5
+      md5: dd8d396c2c16087d0bf88b07fb1adc22
+      size: 17740021
+  split:
+    cmd: python -m src.pipeline.run_split
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01a34c4edc3013046dd215796ce3b63a
+      size: 7465
+    - path: data/interim/ml_orders_labeled.parquet
+      hash: md5
+      md5: dd8d396c2c16087d0bf88b07fb1adc22
+      size: 17740021
+    - path: src/pipeline/split.py
+      hash: md5
+      md5: b9726af186e2d9a8d5e12b0a96a94c3d
+      size: 2054
+    outs:
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: ec21e74b0e64c818deca96b0f3b3a5be
+      size: 2813901
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: b96b245add8487684f1c9ea72d43525d
+      size: 12534981
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: 543ba15f5a3f1ff99de47aa67a9a39d3
+      size: 2811055
+  eda:
+    cmd: python -m src.pipeline.run_eda
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01a34c4edc3013046dd215796ce3b63a
+      size: 7465
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: b96b245add8487684f1c9ea72d43525d
+      size: 12534981
+    - path: src/pipeline/eda.py
+      hash: md5
+      md5: f3a7e49cc4f010332c14b68721a5c110
+      size: 8419
+    - path: src/pipeline/eda_feature_selection.py
+      hash: md5
+      md5: 61a469759038aced828b9367c1f1b0f9
+      size: 10780
+    - path: src/pipeline/eda_plots.py
+      hash: md5
+      md5: bb985a1fed726d98b7e192822ff6abdb
+      size: 5429
+    - path: src/pipeline/eda_relations.py
+      hash: md5
+      md5: facf8c00e5fa130a09e0d016bc7fa5a0
+      size: 6518
+    - path: src/pipeline/eda_summaries.py
+      hash: md5
+      md5: 09cbac2eb43d6cae5cdd8cfd54dbd508
+      size: 5679
+    outs:
+    - path: reports/eda
+      hash: md5
+      md5: 9c32fa6fac89cf7f9815a9c9f6c7bdc5.dir
+      size: 1150842
+      nfiles: 23
+  feature_engineering:
+    cmd: python -m src.pipeline.run_feature_engineering
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01a34c4edc3013046dd215796ce3b63a
+      size: 7465
+    - path: data/processed/test.parquet
+      hash: md5
+      md5: ec21e74b0e64c818deca96b0f3b3a5be
+      size: 2813901
+    - path: data/processed/train.parquet
+      hash: md5
+      md5: b96b245add8487684f1c9ea72d43525d
+      size: 12534981
+    - path: data/processed/val.parquet
+      hash: md5
+      md5: 543ba15f5a3f1ff99de47aa67a9a39d3
+      size: 2811055
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 6f831b9cbc09e4d69ea62aa49f1aaf22
+      size: 9457
+    - path: src/features/derived_features.py
+      hash: md5
+      md5: d2d5ddff62b2bf9783b1d4f0fed0a966
+      size: 1566
+    - path: src/features/shipping_pressure.py
+      hash: md5
+      md5: 477066e0ef65d1d011d3ec92c762bb5d
+      size: 6963
+    - path: src/pipeline/feature_engineering.py
+      hash: md5
+      md5: a6b05b980f6d80af02aa5fa2752d161f
+      size: 3983
+    outs:
+    - path: data/processed/feature_table_test.parquet
+      hash: md5
+      md5: 137915bd73190bf4912de86899a8280b
+      size: 525091
+    - path: data/processed/feature_table_train.parquet
+      hash: md5
+      md5: 5d7c54065797e5e09bd622fba74f4772
+      size: 2189380
+    - path: data/processed/feature_table_val.parquet
+      hash: md5
+      md5: fed9af88456871caea44d4cae0ec52e3
+      size: 525418
+    - path: models/feature_engineering_artifacts/feature_list_raw.json
+      hash: md5
+      md5: 75de5688a4c58fa8d1ba7ef106aae9a6
+      size: 345
+    - path: models/feature_engineering_artifacts/final_feature_list.json
+      hash: md5
+      md5: 5a1096ea6a0f6b57a5d8b51cf99e8f9e
+      size: 1250
+    - path: models/feature_engineering_artifacts/numeric_imputer.joblib
+      hash: md5
+      md5: b6740ec48b46c7dbc8c3288be09d1762
+      size: 1143
+    - path: models/feature_engineering_artifacts/onehot_encoder.joblib
+      hash: md5
+      md5: 10bcb2781db399a7c61f53ddeae8530a
+      size: 1676
+    - path: models/feature_engineering_artifacts/payment_encoder.joblib
+      hash: md5
+      md5: eb6cddf36db90369b694f3a67e0611f2
+      size: 688
+    - path: models/feature_engineering_artifacts/same_state_fill_value.joblib
+      hash: md5
+      md5: 43b6480077c2e1010fca519b79e5b88e
+      size: 109
+  train:
+    cmd: python -m src.pipeline.run_train
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 01a34c4edc3013046dd215796ce3b63a
+      size: 7465
+    - path: data/processed/feature_table_test.parquet
+      hash: md5
+      md5: 137915bd73190bf4912de86899a8280b
+      size: 525091
+    - path: data/processed/feature_table_train.parquet
+      hash: md5
+      md5: 5d7c54065797e5e09bd622fba74f4772
+      size: 2189380
+    - path: data/processed/feature_table_val.parquet
+      hash: md5
+      md5: fed9af88456871caea44d4cae0ec52e3
+      size: 525418
+    - path: models/feature_engineering_artifacts/final_feature_list.json
+      hash: md5
+      md5: 5a1096ea6a0f6b57a5d8b51cf99e8f9e
+      size: 1250
+    - path: src/pipeline/train.py
+      hash: md5
+      md5: bf05c4af6de0b4ada05de71373e1008f
+      size: 9445
+    params:
+      config/config.yaml:
+        model.class_weight: balanced
+        model.param_grid:
+          n_estimators:
+          - 200
+          - 400
+          max_depth:
+          - 
+          - 10
+          - 20
+          min_samples_leaf:
+          - 1
+          - 5
+          - 10
+        model.tuning_metric: f1
+    outs:
+    - path: models/model_artifacts/final_model_config.json
+      hash: md5
+      md5: dd538d76b0866d847b46b683d4d27bca
+      size: 358
+    - path: models/model_artifacts/final_model_random_forest.joblib
+      hash: md5
+      md5: 6534126a9d9e37a267b07c55fde41841
+      size: 108808345
+    - path: models/model_artifacts/results_summary.csv
+      hash: md5
+      md5: ae7b1ae3eb98bdf0e5e1f5679425f512
+      size: 2100
