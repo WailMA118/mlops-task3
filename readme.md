@@ -116,7 +116,7 @@ cp .env.example .env
 Once `docker-compose.yml` is added (see Status above), this will be:
 
 ```bash
-docker compose up -d db mlflow minio
+docker compose up -d db mlflow
 ```
 
 For now, run Postgres and an MLflow tracking server locally, matching the
