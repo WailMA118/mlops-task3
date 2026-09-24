@@ -1,0 +1,11 @@
+[core]
+    remote = storage
+    autostage = true
+
+# Local/dev default: a local folder acting as the DVC remote (e.g. a mounted
+# volume or network share). Override in CI/production via 'dvc remote modify'
+# or DVC_REMOTE_URL, pointing at S3 / GCS / Azure Blob / a shared artifact
+# store the containers can reach (see docker-compose.yml, service `minio` or
+# equivalent object storage), never a path only on a developer's laptop.
+['remote "storage"']
+    url = ../dvc-storage

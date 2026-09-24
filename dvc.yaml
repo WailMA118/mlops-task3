@@ -1,0 +1,88 @@
+vars:
+  - config/config.yaml
+
+stages:
+  data_prep:
+    cmd: python -m src.pipeline.run_data_prep
+    deps:
+      - src/data/db.py
+      - src/data/build_ml_table.py
+      - src/data/labeling.py
+      - src/data/geo.py
+      - config/config.yaml
+    outs:
+      - data/interim/ml_orders_dataset.parquet
+      - data/interim/ml_orders_labeled.parquet
+
+  split:
+    cmd: python -m src.pipeline.run_split
+    deps:
+      - data/interim/ml_orders_labeled.parquet
+      - src/pipeline/split.py
+      - config/config.yaml
+    outs:
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+
+  eda:
+    # Diagnostic/documentation stage only: reports/plots explaining the data
+    # and the feature-selection rationale. Not a dependency of feature_engineering
+    # or train — deleting or skipping this stage never breaks the model pipeline.
+    cmd: python -m src.pipeline.run_eda
+    deps:
+      - data/processed/train.parquet
+      - src/pipeline/eda.py
+      - src/pipeline/eda_summaries.py
+      - src/pipeline/eda_relations.py
+      - src/pipeline/eda_feature_selection.py
+      - src/pipeline/eda_plots.py
+      - config/config.yaml
+    outs:
+      - reports/eda:
+          cache: false
+
+  feature_engineering:
+    cmd: python -m src.pipeline.run_feature_engineering
+    deps:
+      - data/processed/train.parquet
+      - data/processed/val.parquet
+      - data/processed/test.parquet
+      - src/pipeline/feature_engineering.py
+      - src/features/derived_features.py
+      - src/features/shipping_pressure.py
+      - src/features/build_features.py
+      - config/config.yaml
+    outs:
+      - data/processed/feature_table_train.parquet
+      - data/processed/feature_table_val.parquet
+      - data/processed/feature_table_test.parquet
+      - models/feature_engineering_artifacts/numeric_imputer.joblib
+      - models/feature_engineering_artifacts/onehot_encoder.joblib
+      - models/feature_engineering_artifacts/payment_encoder.joblib
+      - models/feature_engineering_artifacts/same_state_fill_value.joblib
+      - models/feature_engineering_artifacts/feature_list_raw.json
+      - models/feature_engineering_artifacts/final_feature_list.json
+
+  train:
+    cmd: python -m src.pipeline.run_train
+    deps:
+      - data/processed/feature_table_train.parquet
+      - data/processed/feature_table_val.parquet
+      - data/processed/feature_table_test.parquet
+      - models/feature_engineering_artifacts/final_feature_list.json
+      - src/pipeline/train.py
+      - config/config.yaml
+    params:
+      - config/config.yaml:
+          - model.param_grid
+          - model.class_weight
+          - model.tuning_metric
+    outs:
+      - models/model_artifacts/final_model_random_forest.joblib
+    metrics:
+      - models/model_artifacts/final_model_config.json:
+          cache: false
+    plots:
+      - models/model_artifacts/results_summary.csv:
+          cache: false

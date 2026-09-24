@@ -1,0 +1,9 @@
+# Everything under data/ is DVC-tracked (see dvc.yaml outs:), never committed
+# to git directly. DVC writes .dvc pointer files and this project's own
+# .gitignore entries when you run `dvc add` / `dvc repro`.
+raw/*
+interim/*
+processed/*
+!raw/.gitkeep
+!interim/.gitkeep
+!processed/.gitkeep
